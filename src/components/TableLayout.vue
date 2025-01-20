@@ -13,7 +13,7 @@
                 <th
                   v-for="(column, index) in columns"
                   :key="index"
-                  class="px-6 py-3 text-xs font-medium leading-4 flex-wrap tracking-wider text-left text-gray-500 uppercase bg-gray-100 border-b border-gray-200"
+                  class="px-6 py-3 text-xs font-medium leading-4 flex-wrap tracking-wider text-left text-black uppercase bg-[#A93428] border-b border-gray-200"
                 >
                   {{ column.label }}
                 </th>
@@ -24,7 +24,7 @@
                 <td
                   v-for="(column, colIndex) in columns"
                   :key="colIndex"
-                  class="px-6 py-4 border-b border-gray-200 whitespace-nowrap"
+                  class="px-6 py-4 border-b border-gray-200 whitespace-wrap"
                 >
                   <!-- Render slot if available, else render data dynamically -->
                   <slot

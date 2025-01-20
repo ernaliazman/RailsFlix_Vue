@@ -3,39 +3,78 @@
       <h4 class="text-gray-600">Wide Table</h4>
   
       <TableLayout :data="moviesLists" :columns="columns">
-        <!-- Custom slot for "name" column -->
-        <template #column-original_title="{ row }">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 w-10 h-10">
-              <img
-                class="w-10 h-10 rounded-full"
-                :src="row.poster_path"
-                alt="profile pic"
-              />
-            </div>
-            <div class="ml-4">
-              <div class="text-sm font-medium leading-5 text-gray-900">
-                {{ row.title }}
-              </div>
-              <div class="text-sm leading-5 text-gray-500">
-                {{ row.cast }}
-              </div>
-            </div>
-          </div>
-        </template>
-        <!-- Custom slot for "status" column for customization for row-->
-        <template #column-status="{ row }">
-          <span
-            :class="{
-              'inline-flex px-2 text-s font-semibold leading-5 rounded-full': true,
-              'text-green-800 bg-green-100': row.status === 'Released',
-              'text-red-800 bg-red-100': row.status === 'Inactive',
-            }"
-          >
-            {{ row.status }}
-          </span>
-        </template>
-    </TableLayout>
+  <!-- Custom slot for "name" column -->
+  <template #column-original_title="{ row }">
+    <div class="flex items-center">
+      <div class="flex-shrink-0 w-10 h-10">
+        <img
+          class="w-10 h-10 rounded-full"
+          :src="row.poster_path"
+          alt="profile pic"
+        />
+      </div>
+      <div class="ml-4">
+        <div class="text-sm font-medium leading-5 text-gray-900">
+          {{ row.title }}
+        </div>
+        <div class="text-sm leading-5 text-gray-500 ">
+          {{ row.cast }}
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Custom slot for "status" column -->
+  <template #column-status="{ row }">
+    <span
+      :class="{
+        'inline-flex px-2 text-s font-semibold leading-5 rounded-full': true,
+        'text-green-800 bg-green-100': row.status === 'Released',
+        'text-red-800 bg-red-100': row.status === 'Inactive',
+      }"
+    >
+      {{ row.status }}
+    </span>
+  </template>
+
+  <!-- Custom slot for "actions" column -->
+  <template #column-actions="{ row }">
+    <div class="flex space-x-2">
+      <button
+        @click="editRow(row)"
+        class="p-2 text-blue-500 hover:text-blue-600 rounded focus:outline-none"
+      >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+</svg>
+
+        
+      </button>
+      <button
+  @click="deleteRow(row)"
+  class="p-2 text-red-500 hover:text-red-600 rounded focus:outline-none"
+  aria-label="Delete"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke-width="1.5"
+    stroke="currentColor"
+    class="w-6 h-6"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+    />
+  </svg>
+</button>
+
+    </div>
+  </template>
+</TableLayout>
+
     </div>
   </template>
   
@@ -83,6 +122,7 @@ import { stringifyQuery } from 'vue-router';
           { label: 'Status', key: 'status' },
           { label: 'Release Date', key: 'release_date' },
           { label: 'Score', key: 'vote_average' },
+          { label: 'Actions', key: 'actions' },
         ],
       };
     },
