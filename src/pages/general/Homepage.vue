@@ -11,6 +11,10 @@
       :selectedGenre="selectedGenre"
       @filter-selected="setFilter"
     />
+
+    
+
+
      <div class="flex justify-between items-center">
     <!-- Search Bar on the left -->
     <SearchBar
@@ -27,6 +31,7 @@
       :duration="5000"
     />
   </div>
+  <Loading size="5" color="green-600" />
 
     <!-- Movie Table -->
     <TableLayout :data="filteredMovies" :columns="columns">
@@ -116,10 +121,12 @@ import TableLayout from "../../components/TableLayout.vue";
 import FilterBubble from "../../components/FilterBubble.vue";
 import SearchBar from "../../components/SearchBar.vue";
 import Alert from "../../components/Alert.vue";
+import Loading from "../../components/Loading.vue";
 
 
 export default {
   components: {
+    Loading,
     Alert,
     SearchBar,
     TableLayout,
@@ -171,6 +178,7 @@ export default {
   methods: {
     toggleClick(row) {
       row.clicked = !row.clicked;
+      row.showAlert = true;
     },
     handleSearch(query) {
       this.searchQuery = query; // Update search query
