@@ -9,7 +9,7 @@ const routes = [
     component: Layout,
     children: [
       {
-        path: "/homepage", // Default route for the layout
+        path: "homepage", // Default route for the layout
         name: "Homepage",
         component: Homepage,
       },
@@ -18,6 +18,7 @@ const routes = [
         name: "Movielists",
         component: MovieLists,
       },
+      
     ],
   },
 ];
