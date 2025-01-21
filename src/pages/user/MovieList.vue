@@ -4,12 +4,25 @@
   🎬Your Movie Lists
 </h4>
 
-<Alert
+<div>
+   
+
+    <Modal
+      :isOpen="isModalOpen"
+      @update:isOpen="isModalOpen = $event"
+      @action="removeMovie()"
+      title="Confirm Removal"
+      body="Mufasa will be removed from your library"
+      actionText="Confirm"
+    />
+  </div>
+
+<!-- <Alert
       title="Success"
       message="Your account was registered!"
       type="success"
       :duration="5000"
-    />
+    /> -->
     <!-- Filter Buttons -->
     <FilterBubble
       :genres="genre"
@@ -38,7 +51,7 @@
               {{ row.title }}
             </div>
             <div class="text-sm leading-5 text-gray-500">
-              {{ row.cast }}
+              {{ row.casts }}
             </div>
           </div>
         </div>
@@ -81,7 +94,7 @@
             </svg>
           </button>
           <button
-            @click="deleteRow(row)"
+            @click="openModal(row)"
             class="p-2 text-red-500 hover:text-red-600 rounded focus:outline-none"
             aria-label="Delete"
           >
@@ -108,23 +121,28 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import axios from "axios";
 import TableLayout from "../../components/TableLayout.vue";
 import FilterBubble from "../../components/FilterBubble.vue";
 import SearchBar from "../../components/SearchBar.vue";
 import Alert from "../../components/Alert.vue";
+import Modal from "../../components/Modal.vue";
 
 
 export default {
   components: {
+    Modal,
     Alert,
     SearchBar,
     TableLayout,
     FilterBubble,
 
   },
+  
   data() {
     return {
+      dataToDelete: null,
       moviesLists: [],
       genre: {},
       searchQuery: "", // New search query data
@@ -134,10 +152,11 @@ export default {
         { label: "Directors", key: "directors" },
         { label: "Genres", key: "genres" },
         { label: "Status", key: "status" },
-        { label: "Release Date", key: "release_date" },
-        { label: "Score", key: "vote_average" },
+        { label: "Release Date", key: "released_date" },
+        { label: "Score", key: "score" },
         { label: "Actions", key: "actions" },
       ],
+      
     };
   },
   computed: {
@@ -162,41 +181,60 @@ export default {
     },
   },
   mounted() {
-    this.getMoviesData();
+    this.getMoviesList();
   },
+
+  //MODAL POPUP
+  setup() {
+    const isModalOpen = ref(false);
+
+    const openModal = (row) => {
+      this.dataToDelete = row; // Store the row to delete
+      isModalOpen.value = true;
+    };
+
+    const handleAction = () => {
+      console.log('Action confirmed!');
+      // You can do anything here, such as making an API call.
+    };
+
+    return {
+      isModalOpen,
+      openModal,
+      handleAction
+    };
+  },
+
+
+//METHODS
   methods: {
     handleSearch(query) {
-      this.searchQuery = query; // Update search query
+      this.searchQuery = query; 
     },
-    async getMoviesData() {
-      await this.getGenre();
-      await this.getMoviesList();
+  
+
+    // openModal(row) {
+    //   const isModalOpen = ref(false);
+    //   this.rowToDelete = row; // Store the row to delete
+    //   isModalOpen.value = true; // Open the modal
+    // },
+
+    //DELETE API
+    removeMovie(){
+      console.log("DATA is deleted");
     },
+
+    //GET API
     async getMoviesList() {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `http://127.0.0.1:3000/api/v1/movies`
         );
-        const movies = response.data.results.map(async (movie) => {
-          const directors = await this.getCredits(movie.id);
-          const status = await this.getStatus(movie.id);
-          const cast = await this.getCasts(movie.id);
-          return {
-            title: movie.original_title,
-            genres: movie.genre_ids
-              .map((id) => this.genre[id] || "Unknown")
-              .join(", "),
-            release_date: movie.release_date,
-            vote_average: Math.trunc(movie.vote_average * 10) + "%",
-            directors,
-            status,
-            cast,
-            poster_path: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
-          };
-        });
-        this.moviesLists = await Promise.all(movies);
+        this.moviesLists = response.data.results;
+        console.log("Data from db ",this.movieLists)
+        
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching data: ",error);
       }
     },
     async getGenre() {
@@ -212,66 +250,7 @@ export default {
         console.error(error);
       }
     },
-    async getCasts(movieId) {
-            try {
-                const response = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`); 
-     
-                 const cast = response.data;
-      
-                // Extract the cast information (name and character)
-
-                const casts = cast.cast
-                .slice(0, 5)  // Get the first 5 actors
-                .map(actor => actor.name);
-
-                // Join the first 5 actors with a comma
-                return casts.join(', ');
-                
-      
-      // Return the formatted cast as a comma-separated string or array (depending on your needs)
-            return casts;
-            } catch (error) {
-                console.error('Failed to fetch cast:', error);
-                return []; // Return an empty array if the request fails
-            }
-        },
-
-        async getCredits(movieId) {
-            try {
-                const response = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`); // Replace with your credits API endpoint
-     
-                 this.credits = response.data;
-
-                // Extract directors from the crew array
-                const directors = this.credits.crew
-                .filter(crewMember => crewMember.job === 'Director')
-                .map(director => director.name);
-
-                // Join directors with a comma if there are multiple
-                return directors.join(', '); 
-        } catch (error) {
-                console.error('Failed to fetch credits:', error);
-                return '';
-        }
-    },
-
-    async getStatus(movieId) {
-    try {
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=432fd6918c7280751ae578aaaa17cbac`); // Replace with your movie status API endpoint
-    
-       this.statusData = await response.data;
-
-       // Return the status of the movie
-      return this.statusData.status; 
-
-    } catch (error) {
-      console.error('Failed to fetch movie status:', error);
-      return 'Unknown'; // Return a default status if the request fails
-    }
-  },
+  
     setFilter(selectedGenre) {
       this.selectedGenre = selectedGenre; // Update the selected genre
     },

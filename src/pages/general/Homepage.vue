@@ -24,12 +24,12 @@
     />
 
     <!-- Alert on the right -->
-    <Alert
+    <!-- <Alert
       title="Success"
       message="Your account was registered!"
       type="success"
       :duration="5000"
-    />
+    /> -->
   </div>
   <Loading size="5" color="green-600" />
 
@@ -71,10 +71,42 @@
 
       <!-- Custom slot for "actions" column -->
       <template #column-actions="{ row }">
-        <div class="flex space-x-2">
+  <div class="flex space-x-2">
+    <!-- Show the loading spinner if isLoading is true -->
     <button
+      v-if="row.isLoading"
+      class="p-2 text-yellow-500 hover:text-green-600 rounded focus:outline-none"
+    >
+      <!-- Loading Spinner -->
+      <svg
+        class="w-6 h-6 animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor"
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+          fill="none"
+        />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M4 12a8 8 0 0 1 8-8m0 0a8 8 0 0 1 8 8m-8 0a8 8 0 0 1-8 8"
+        />
+      </svg>
+    </button>
+
+    <!-- Show the SVG button if isLoading is false -->
+    <button
+      v-else
       @click="toggleClick(row)"
-      class="p-2 text-yellow-500 hover:text-blue-600 rounded focus:outline-none"
+      class="p-2 text-amber-500 hover:text-blue-600 rounded focus:outline-none"
     >
       <!-- If clicked, show filled icon; otherwise, show outlined icon -->
       <svg
@@ -136,6 +168,7 @@ export default {
   data() {
     return {
       clicked: false,
+     
       moviesLists: [],
       genre: {},
       searchQuery: "", // New search query data
@@ -176,13 +209,59 @@ export default {
     this.getMoviesData();
   },
   methods: {
-    toggleClick(row) {
+    //To map the table data to the api body structure
+    
+    async toggleClick(row) {
+      try{
+        row.isLoading = true;
+        await this.insertMoviesLibrary(row);
+        
       row.clicked = !row.clicked;
       row.showAlert = true;
+      }
+      catch(error){
+        console.error('Error sending movie data:', error);
+      }
+      finally {
+    // After the API request completes (success or failure), set isLoading to false
+      row.isLoading = false;
+  }
+      
     },
     handleSearch(query) {
-      this.searchQuery = query; // Update search query
+      this.searchQuery = query;
     },
+
+
+
+    //POST METHOD
+   async insertMoviesLibrary(row){
+      try {
+        const mapToApi = {
+          title: row.title,
+          casts: row.cast, 
+          directors: row.directors, 
+          genres: row.genres,
+          status: row.status,
+          released_date: row.release_date,
+          score: row.vote_average,
+          poster_path: row.poster_path
+      };
+        const response = await axios.post(
+      `http://127.0.0.1:3000/api/v1/movies`,
+      mapToApi
+    );
+    console.log('Movie added successfully:', response.data);
+    return response;
+
+  } catch (error) {
+
+    console.error('Error adding movie:', error);
+    throw error;
+  }
+    },
+
+    //GET METHOD
     async getMoviesData() {
       await this.getGenre();
       await this.getMoviesList();
@@ -190,8 +269,10 @@ export default {
     async getMoviesList() {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
+           `https://api.themoviedb.org/3/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
+          //  `${process.env.TMBD_API}/discover/movie?api_key=${process.env.API_KEY}`
         );
+        console.log("response test", response)
         const movies = response.data.results.map(async (movie) => {
           const directors = await this.getCredits(movie.id);
           const status = await this.getStatus(movie.id);

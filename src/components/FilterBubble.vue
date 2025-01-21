@@ -30,6 +30,12 @@ button {
 <template>
     <div class="mb-4">
       <button
+        @click="clearFilter"
+        class="px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300"
+      >
+        All Genre
+      </button>
+      <button
         v-for="(name, id) in genres"
         :key="id"
         @click="selectFilter(id)"
@@ -42,12 +48,7 @@ button {
       >
         {{ name }}
       </button>
-      <button
-        @click="clearFilter"
-        class="px-4 py-2 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300"
-      >
-        Clear Filter
-      </button>
+     
     </div>
   </template>
   

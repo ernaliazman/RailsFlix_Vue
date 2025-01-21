@@ -1,4 +1,3 @@
-
 <script>
 export default {
   mounted() {
@@ -88,4 +87,3 @@ export default {
      </div>
    </div>
  </template>
- 
