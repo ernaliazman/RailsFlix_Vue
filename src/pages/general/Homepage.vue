@@ -31,7 +31,7 @@
       :duration="5000"
     /> -->
   </div>
-  <Loading size="5" color="green-600" />
+  
 
     <!-- Movie Table -->
     <TableLayout :data="filteredMovies" :columns="columns">
@@ -78,28 +78,7 @@
       class="p-2 text-yellow-500 hover:text-green-600 rounded focus:outline-none"
     >
       <!-- Loading Spinner -->
-      <svg
-        class="w-6 h-6 animate-spin"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          stroke-width="4"
-          fill="none"
-        />
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4 12a8 8 0 0 1 8-8m0 0a8 8 0 0 1 8 8m-8 0a8 8 0 0 1-8 8"
-        />
-      </svg>
+      <Loading size="5" color="green-500" />
     </button>
 
     <!-- Show the SVG button if isLoading is false -->
@@ -209,8 +188,6 @@ export default {
     this.getMoviesData();
   },
   methods: {
-    //To map the table data to the api body structure
-    
     async toggleClick(row) {
       try{
         row.isLoading = true;
@@ -238,6 +215,7 @@ export default {
    async insertMoviesLibrary(row){
       try {
         const mapToApi = {
+          id: row.id,
           title: row.title,
           casts: row.cast, 
           directors: row.directors, 
@@ -278,6 +256,7 @@ export default {
           const status = await this.getStatus(movie.id);
           const cast = await this.getCasts(movie.id);
           return {
+            id: movie.id,
             title: movie.original_title,
             genres: movie.genre_ids
               .map((id) => this.genre[id] || "Unknown")

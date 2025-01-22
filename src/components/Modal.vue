@@ -105,7 +105,7 @@
       },
       confirmAction() {
         this.$emit('action');
-        this.closeModal();
+        //this.closeModal();
       }
     }
   };

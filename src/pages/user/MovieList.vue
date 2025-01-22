@@ -7,22 +7,25 @@
 <div>
    
 
+    <!-- Modal DELETE -->
     <Modal
       :isOpen="isModalOpen"
       @update:isOpen="isModalOpen = $event"
-      @action="removeMovie()"
-      title="Confirm Removal"
-      body="Mufasa will be removed from your library"
+      :title="'Confirm Removal'"
+      :body="`${selectedTitle} will be removed from your library`"
       actionText="Confirm"
-    />
+      @action = "removeMovie(dataToDelete)"
+    >
+      <!-- Action Slot -->
+      <template #action>
+        <div v-if="loading">
+          <Loading size="6" color="blue-600" />
+        </div>
+      
+      </template>
+    </Modal>
   </div>
 
-<!-- <Alert
-      title="Success"
-      message="Your account was registered!"
-      type="success"
-      :duration="5000"
-    /> -->
     <!-- Filter Buttons -->
     <FilterBubble
       :genres="genre"
@@ -142,7 +145,7 @@ export default {
   
   data() {
     return {
-      dataToDelete: null,
+      //dataToDelete: null,
       moviesLists: [],
       genre: {},
       searchQuery: "", // New search query data
@@ -184,25 +187,48 @@ export default {
     this.getMoviesList();
   },
 
-  //MODAL POPUP
-  setup() {
+  //MODAL POPUP DELETE
+  //Expose the setup to the parents
+  setup(_, { expose }) {
     const isModalOpen = ref(false);
+    const dataToDelete = ref(null);
+   const selectedTitle = ref("");
+   const loading = ref(false);
 
+   //Opening the modal and assigning the value the data
     const openModal = (row) => {
-      this.dataToDelete = row; // Store the row to delete
+      console.log("Row to be deleted",row);
+      dataToDelete.value = row;
+      selectedTitle.value = row.title;
       isModalOpen.value = true;
+      console.log("Title selected",row.title);
+    };
+
+    //Closing modal after finishing
+    const closeModal = () => {
+      isModalOpen.value = false;
+      dataToDelete.value = null;
+      selectedTitle.value = '';
     };
 
     const handleAction = () => {
       console.log('Action confirmed!');
       // You can do anything here, such as making an API call.
     };
+    expose({
+      openModal,
+    });
 
     return {
+      closeModal,
       isModalOpen,
+      selectedTitle,
+      dataToDelete,
+      loading,
       openModal,
       handleAction
     };
+    
   },
 
 
@@ -213,15 +239,24 @@ export default {
     },
   
 
-    // openModal(row) {
-    //   const isModalOpen = ref(false);
-    //   this.rowToDelete = row; // Store the row to delete
-    //   isModalOpen.value = true; // Open the modal
-    // },
-
     //DELETE API
-    removeMovie(){
-      console.log("DATA is deleted");
+    async removeMovie(dataToDelete){
+      this.loading = true;
+      try {
+        const response = await axios.delete(
+          `http://127.0.0.1:3000/api/v1/movies/${dataToDelete.id}`
+        );
+        
+        console.log("Deleted successfully",response.data)
+
+        this.isModalOpen = false;
+        this.dataToDelete = null;
+        this.selectedTitle = '';
+        this.getMoviesList();
+        
+      } catch (error) {
+        console.error("Error deleting movie: ",error);
+      }
     },
 
     //GET API
@@ -231,7 +266,7 @@ export default {
           `http://127.0.0.1:3000/api/v1/movies`
         );
         this.moviesLists = response.data.results;
-        console.log("Data from db ",this.movieLists)
+        console.log("Data from db ",this.moviesLists)
         
       } catch (error) {
         console.error("Error fetching data: ",error);
