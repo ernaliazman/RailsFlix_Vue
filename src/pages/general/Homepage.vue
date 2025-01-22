@@ -103,6 +103,8 @@
           d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
         />
       </svg>
+
+      <!-- If not clicked, show outlined icon -->
       <svg
         v-else
         xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +149,7 @@ export default {
   data() {
     return {
       clicked: false,
-     
+     userMovieLists: [],
       moviesLists: [],
       genre: {},
       searchQuery: "", // New search query data
@@ -185,13 +187,22 @@ export default {
     },
   },
   mounted() {
+  this.getUsersMovies().then(() => {
     this.getMoviesData();
-  },
+  });
+},
   methods: {
     async toggleClick(row) {
       try{
         row.isLoading = true;
-        await this.insertMoviesLibrary(row);
+
+        if(row.clicked){
+          await this.removeMovie(row);
+        }
+        else{
+          await this.insertMoviesLibrary(row);
+        }
+        
         
       row.clicked = !row.clicked;
       row.showAlert = true;
@@ -208,7 +219,23 @@ export default {
     handleSearch(query) {
       this.searchQuery = query;
     },
+//DELETE API
+//Remove movie from bookmark
+async removeMovie(row){
+      this.loading = true;
+      try {
+        const response = await axios.delete(
+          `http://127.0.0.1:3000/api/v1/movies/${row.id}`
+        );
+        
+        console.log("Deleted successfully",response.data)
 
+        this.mounted();
+        
+      } catch (error) {
+        console.error("Error deleting movie: ",error);
+      }
+    },
 
 
     //POST METHOD
@@ -240,6 +267,20 @@ export default {
     },
 
     //GET METHOD
+
+    async getUsersMovies(){
+      try{
+        const response = await axios.get(
+          `http://127.0.0.1:3000/api/v1/movies`
+        );
+        this.userMovieLists = response.data.results;
+        console.log("Data from db ",this.userMovieLists)
+      }
+      catch(error){
+        console.error("Error fetching data: ",error);
+      }
+
+    },
     async getMoviesData() {
       await this.getGenre();
       await this.getMoviesList();
@@ -255,6 +296,11 @@ export default {
           const directors = await this.getCredits(movie.id);
           const status = await this.getStatus(movie.id);
           const cast = await this.getCasts(movie.id);
+
+          // Check if the movie exists in the user's list
+          //Return true if exists
+          const matched = this.userMovieLists.some((userMovie) => userMovie.id === movie.id);
+
           return {
             id: movie.id,
             title: movie.original_title,
@@ -267,6 +313,7 @@ export default {
             status,
             cast,
             poster_path: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
+            clicked: matched, 
           };
         });
         this.moviesLists = await Promise.all(movies);

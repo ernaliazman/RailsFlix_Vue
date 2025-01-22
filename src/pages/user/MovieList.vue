@@ -25,30 +25,36 @@
       @update:isOpen="isModalEditOpen = $event"
       :title="'Update Movie'"
       actionText="Update"
-      @action = "updateMovie(expectedData)"
+      @action = "updateMovie(updateReview, updateStatus, id)"
     >
       <!-- Form Content as a Slot -->
       <!-- v-model="expectedData.title"
       v-model="editedData.description"
       v-model="editedData.genre" -->
-      <template #customBody>
-  <form @submit.prevent="updateMovie(expectedData)" class="px-8 pt-6">
+    <template #customBody>
+  <form @submit.prevent="updateMovie(updateReview,updateStatus,id)" class="px-8 pt-6">
     <div class="w-full max-w-xs">
 
     <div class="mb-2">
       <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
         Status
       </label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
-    </div>
+      <!-- v-model=expectedData.status -->
+    <Dropdown
+      :options="dropdownOptions"
+      v-model=updateStatus
+      placeholder="Choose a status"
+    />
+    <!-- v-model =expectedData.review -->
+</div>
     <div class="mb-2">
-      <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
-        Feedback
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="feedback">
+        Review
       </label>
-      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
+      <textarea v-model =updateReview
+      class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="feedback"   placeholder="Review">
+      </textarea>
     </div>
-  
-
 
 </div>
     <!-- Submit Button -->
@@ -100,7 +106,7 @@
           :class="{
             'inline-flex px-2 text-s font-semibold leading-5 rounded-full': true,
             'text-green-800 bg-green-100': row.status === 'Released',
-            'text-red-800 bg-red-100': row.status === 'Inactive',
+            'text-amber-800 bg-amber-100': row.status === 'Watched',
           }"
         >
           {{ row.status }}
@@ -159,16 +165,18 @@
 
 <script>
 import { ref } from 'vue';
+import { toRaw } from 'vue';
 import axios from "axios";
 import TableLayout from "../../components/TableLayout.vue";
 import FilterBubble from "../../components/FilterBubble.vue";
 import SearchBar from "../../components/SearchBar.vue";
 import Alert from "../../components/Alert.vue";
 import Modal from "../../components/Modal.vue";
-
+import Dropdown from "../../components/Dropdown.vue";
 
 export default {
   components: {
+    Dropdown,
     Modal,
     Alert,
     SearchBar,
@@ -191,8 +199,16 @@ export default {
         { label: "Status", key: "status" },
         { label: "Release Date", key: "released_date" },
         { label: "Score", key: "score" },
+        { label: "Review", key: "review" },
         { label: "Actions", key: "actions" },
       ],
+      dropdownOptions: [
+        { label: 'Watched', value: 'Watched' },
+        { label: 'Released', value: 'Released' },
+        
+       
+      ],
+      selectedOption: null,
       
     };
   },
@@ -228,6 +244,10 @@ export default {
     const isModalEditOpen = ref(false);
     const expectedData = ref(null);
    const selectedTitle = ref("");
+   const updateStatus = ref("");
+   const updateReview = ref("");
+   const id = ref();
+
    const loading = ref(false);
 
    //Opening the modal and assigning the value the data
@@ -235,6 +255,11 @@ export default {
    const openModalEdit = (row) => {
       console.log("Row to be updated",row);
       expectedData.value = row;
+      updateStatus.value = row.status;
+      updateReview.value = row.review;
+      id.value = row.id;
+
+      console.log("Status",status.value);
       //selectedTitle.value = row.title;
       isModalEditOpen.value = true;
     };
@@ -260,11 +285,14 @@ export default {
 
     return {
       closeModal,
+      id,
       isModalOpen,
       isModalEditOpen,
       selectedTitle,
       expectedData,
       loading,
+      updateStatus,
+      updateReview,
       openModal,
       openModalEdit
     };
@@ -279,8 +307,24 @@ export default {
     },
 
     //UPDATE API
-    async updateMovie(expectedData){
-      //API update here
+    async updateMovie(review,status,id){
+     try{
+       const response = await axios.put(
+        `http://127.0.0.1:3000/api/v1/movies/${id}`,
+        {
+          review: review,
+          status: status,
+        })
+
+        this.isModalEditOpen = false;
+        this.expectedData = null;
+        this.updateReview = '';
+        this.updateStatus = '';
+        this.getMoviesList();
+     }
+     catch(error){
+       console.error("Error updating movie: ",error);
+     }
       console.log("Data to be updated",expectedData);
     },
   
