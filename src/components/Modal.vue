@@ -13,7 +13,7 @@
         class="z-50 w-11/12 mx-auto overflow-y-auto bg-white rounded shadow-lg modal-container md:max-w-md"
       >
         <!-- Close Button (Esc) -->
-        <div
+        <!-- <div
           class="absolute top-0 right-0 z-50 flex flex-col items-center mt-4 mr-4 text-sm text-white cursor-pointer modal-close"
           @click="closeModal"
         >
@@ -29,7 +29,7 @@
             />
           </svg>
           <span class="text-sm">(Esc)</span>
-        </div>
+        </div> -->
   
         <!-- Modal Content -->
         <div class="px-6 py-4 text-left modal-content">
@@ -56,7 +56,9 @@
   
           <!-- Body -->
           <div class="pb-4">
-            <slot name="body">{{ body }}</slot>
+            <slot name="customBody" v-if="$slots.customBody"></slot>
+      <!-- Fallback to body prop if bodyErna slot is not provided -->
+            <slot v-else>{{ body }}</slot>
           </div>
   
           <!-- Footer -->

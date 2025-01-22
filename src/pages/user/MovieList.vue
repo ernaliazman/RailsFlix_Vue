@@ -7,23 +7,57 @@
 <div>
    
 
-    <!-- Modal DELETE -->
+    <!-- Modal CONFIRM DELETE -->
     <Modal
       :isOpen="isModalOpen"
       @update:isOpen="isModalOpen = $event"
       :title="'Confirm Removal'"
       :body="`${selectedTitle} will be removed from your library`"
       actionText="Confirm"
-      @action = "removeMovie(dataToDelete)"
+      @action = "removeMovie(expectedData)"
     >
-      <!-- Action Slot -->
-      <template #action>
-        <div v-if="loading">
-          <Loading size="6" color="blue-600" />
-        </div>
-      
-      </template>
     </Modal>
+
+       <!-- Modal CONFIRM EDIT -->
+          <!-- :body="`${selectedTitle} will be updated in your library`" -->
+       <Modal
+      :isOpen="isModalEditOpen"
+      @update:isOpen="isModalEditOpen = $event"
+      :title="'Update Movie'"
+      actionText="Update"
+      @action = "updateMovie(expectedData)"
+    >
+      <!-- Form Content as a Slot -->
+      <!-- v-model="expectedData.title"
+      v-model="editedData.description"
+      v-model="editedData.genre" -->
+      <template #customBody>
+  <form @submit.prevent="updateMovie(expectedData)" class="px-8 pt-6">
+    <div class="w-full max-w-xs">
+
+    <div class="mb-2">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+        Status
+      </label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
+    </div>
+    <div class="mb-2">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+        Feedback
+      </label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
+    </div>
+  
+
+
+</div>
+    <!-- Submit Button -->
+   
+  </form>
+</template>
+
+    </Modal>
+
   </div>
 
     <!-- Filter Buttons -->
@@ -77,7 +111,7 @@
       <template #column-actions="{ row }">
         <div class="flex space-x-2">
           <button
-            @click="editRow(row)"
+            @click="openModalEdit(row)"
             class="p-2 text-blue-500 hover:text-blue-600 rounded focus:outline-none"
           >
             <!-- Edit Icon -->
@@ -191,14 +225,23 @@ export default {
   //Expose the setup to the parents
   setup(_, { expose }) {
     const isModalOpen = ref(false);
-    const dataToDelete = ref(null);
+    const isModalEditOpen = ref(false);
+    const expectedData = ref(null);
    const selectedTitle = ref("");
    const loading = ref(false);
 
    //Opening the modal and assigning the value the data
+
+   const openModalEdit = (row) => {
+      console.log("Row to be updated",row);
+      expectedData.value = row;
+      //selectedTitle.value = row.title;
+      isModalEditOpen.value = true;
+    };
+
     const openModal = (row) => {
       console.log("Row to be deleted",row);
-      dataToDelete.value = row;
+      expectedData.value = row;
       selectedTitle.value = row.title;
       isModalOpen.value = true;
       console.log("Title selected",row.title);
@@ -207,14 +250,10 @@ export default {
     //Closing modal after finishing
     const closeModal = () => {
       isModalOpen.value = false;
-      dataToDelete.value = null;
+      expectedData.value = null;
       selectedTitle.value = '';
     };
 
-    const handleAction = () => {
-      console.log('Action confirmed!');
-      // You can do anything here, such as making an API call.
-    };
     expose({
       openModal,
     });
@@ -222,11 +261,12 @@ export default {
     return {
       closeModal,
       isModalOpen,
+      isModalEditOpen,
       selectedTitle,
-      dataToDelete,
+      expectedData,
       loading,
       openModal,
-      handleAction
+      openModalEdit
     };
     
   },
@@ -237,20 +277,25 @@ export default {
     handleSearch(query) {
       this.searchQuery = query; 
     },
-  
 
+    //UPDATE API
+    async updateMovie(expectedData){
+      //API update here
+      console.log("Data to be updated",expectedData);
+    },
+  
     //DELETE API
-    async removeMovie(dataToDelete){
+    async removeMovie(expectedData){
       this.loading = true;
       try {
         const response = await axios.delete(
-          `http://127.0.0.1:3000/api/v1/movies/${dataToDelete.id}`
+          `http://127.0.0.1:3000/api/v1/movies/${expectedData.id}`
         );
         
         console.log("Deleted successfully",response.data)
 
         this.isModalOpen = false;
-        this.dataToDelete = null;
+        this.expectedData = null;
         this.selectedTitle = '';
         this.getMoviesList();
         
