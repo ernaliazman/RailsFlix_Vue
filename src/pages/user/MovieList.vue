@@ -172,7 +172,8 @@ import FilterBubble from "../../components/FilterBubble.vue";
 import SearchBar from "../../components/SearchBar.vue";
 import Alert from "../../components/Alert.vue";
 import Modal from "../../components/Modal.vue";
-import Dropdown from "../../components/Dropdown.vue";
+import authService from '../../auth/auth.js';
+import Dropdown from '../../components/Dropdown.vue';
 
 export default {
   components: {
@@ -351,6 +352,7 @@ export default {
     //GET API
     async getMoviesList() {
       try {
+        authService.setAuthHeader();
         const response = await axios.get(
           `http://127.0.0.1:3000/api/v1/movies`
         );
