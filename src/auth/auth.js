@@ -13,25 +13,42 @@ const setAuthHeader = () => {
   }
 };
 
-// Store the token in localStorage
-const saveToken = (token) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  setAuthHeader();  // Update axios header after saving the token
+const saveUserId = (id) => {
+  localStorage.setItem('userId', id);
+};
+const saveUserName = (name) => {
+  localStorage.setItem('userName', name);
 };
 
-// Retrieve the token from localStorage
+const saveToken = (token) => {
+  localStorage.setItem(TOKEN_KEY, token);
+  setAuthHeader();  
+};
+
+
 const getToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
 
-// Remove the token from localStorage
+const getUserId = () => {
+  return localStorage.getItem('userId');
+};
+const getUserName = () => {
+  return localStorage.getItem('userName');
+};
+
+
 const removeToken = () => {
   localStorage.removeItem(TOKEN_KEY);
   setAuthHeader();  // Update axios header after removing the token
 };
 
 export default {
+  saveUserId,
+  saveUserName,
   saveToken,
+  getUserName,
+  getUserId,
   getToken,
   removeToken,
   setAuthHeader,

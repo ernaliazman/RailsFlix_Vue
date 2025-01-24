@@ -55,6 +55,7 @@
 
 <script>
 import axios from 'axios';
+import Swal from 'sweetalert2'
 import authService from '../../auth/auth.js';
 export default {
     data(){
@@ -82,8 +83,20 @@ export default {
         console.log('Login successful:', response.data);
 
         authService.saveToken(response.data.token);
+        authService.saveUserId(response.data.user_id);
+        console.log('Login', response.data.user_id);
+        authService.saveUserName(response.data.name);
 
-        this.$router.push('/homepage'); 
+        Swal.fire({
+        title: 'Success!',
+        text: response.data.status,
+        icon: 'success',
+        confirmButtonColor: "#A93428",
+        confirmButtonText: 'Okay'
+        }).then(() => {
+  
+          this.$router.push('/homepage');
+});
 
       } catch (error) {
         // Handle error

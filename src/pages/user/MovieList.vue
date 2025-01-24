@@ -188,7 +188,7 @@ export default {
   
   data() {
     return {
-      //dataToDelete: null,
+      user_id: '',
       moviesLists: [],
       genre: {},
       searchQuery: "", // New search query data
@@ -235,6 +235,8 @@ export default {
     },
   },
   mounted() {
+     this.user_id = authService.getUserId();
+     
     this.getMoviesList();
   },
 
@@ -326,7 +328,7 @@ export default {
      catch(error){
        console.error("Error updating movie: ",error);
      }
-      console.log("Data to be updated",expectedData);
+      console.log("Data to be updated",this.expectedData);
     },
   
     //DELETE API
@@ -354,7 +356,7 @@ export default {
       try {
         authService.setAuthHeader();
         const response = await axios.get(
-          `http://127.0.0.1:3000/api/v1/movies`
+          `http://127.0.0.1:3000/api/v1/movies/${this.user_id}`
         );
         this.moviesLists = response.data.results;
         console.log("Data from db ",this.moviesLists)

@@ -1,9 +1,10 @@
 <template>
   <div class="mt-8">
-    <h4 class="text-2xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 mb-4">
-  🎬Movie Lists
-</h4>
-
+    <h4
+      class="text-2xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 mb-4"
+    >
+      🎬Movie Lists
+    </h4>
 
     <!-- Filter Buttons -->
     <FilterBubble
@@ -12,26 +13,22 @@
       @filter-selected="setFilter"
     />
 
-    
+    <div class="flex justify-between items-center">
+      <!-- Search Bar on the left -->
+      <SearchBar
+        placeholder="Search movies by title..."
+        @search="handleSearch"
+        class="w-full"
+      />
 
-
-     <div class="flex justify-between items-center">
-    <!-- Search Bar on the left -->
-    <SearchBar
-      placeholder="Search movies by title..."
-      @search="handleSearch"
-      class="w-full"
-    />
-
-    <!-- Alert on the right -->
-    <!-- <Alert
+      <!-- Alert on the right -->
+      <!-- <Alert
       title="Success"
       message="Your account was registered!"
       type="success"
       :duration="5000"
     /> -->
-  </div>
-  
+    </div>
 
     <!-- Movie Table -->
     <TableLayout :data="filteredMovies" :columns="columns">
@@ -71,60 +68,59 @@
 
       <!-- Custom slot for "actions" column -->
       <template #column-actions="{ row }">
-  <div class="flex space-x-2">
-    <!-- Show the loading spinner if isLoading is true -->
-    <button
-      v-if="row.isLoading"
-      class="p-2 text-yellow-500 hover:text-green-600 rounded focus:outline-none"
-    >
-      <!-- Loading Spinner -->
-      <Loading size="5" color="green-500" />
-    </button>
+        <div class="flex space-x-2">
+          <!-- Show the loading spinner if isLoading is true -->
+          <button
+            v-if="row.isLoading"
+            class="p-2 text-yellow-500 hover:text-green-600 rounded focus:outline-none"
+          >
+            <!-- Loading Spinner -->
+            <Loading size="5" color="green-500" />
+          </button>
 
-    <!-- Show the SVG button if isLoading is false -->
-    <button
-      v-else
-      @click="toggleClick(row)"
-      class="p-2 text-amber-500 hover:text-blue-600 rounded focus:outline-none"
-    >
-      <!-- If clicked, show filled icon; otherwise, show outlined icon -->
-      <svg
-        v-if="row.clicked"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-        />
-      </svg>
+          <!-- Show the SVG button if isLoading is false -->
+          <button
+            v-else
+            @click="toggleClick(row)"
+            class="p-2 text-amber-500 hover:text-blue-600 rounded focus:outline-none"
+          >
+            <!-- If clicked, show filled icon; otherwise, show outlined icon -->
+            <svg
+              v-if="row.clicked"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+              />
+            </svg>
 
-      <!-- If not clicked, show outlined icon -->
-      <svg
-        v-else
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
-        />
-      </svg>
-    </button>
-  </div>
-</template>
+            <!-- If not clicked, show outlined icon -->
+            <svg
+              v-else
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </template>
     </TableLayout>
-   
   </div>
 </template>
 
@@ -135,7 +131,7 @@ import FilterBubble from "../../components/FilterBubble.vue";
 import SearchBar from "../../components/SearchBar.vue";
 import Alert from "../../components/Alert.vue";
 import Loading from "../../components/Loading.vue";
-
+import authService from "../../auth/auth.js";
 
 export default {
   components: {
@@ -144,16 +140,16 @@ export default {
     SearchBar,
     TableLayout,
     FilterBubble,
-
   },
   data() {
     return {
+      user_id: '',
       clicked: false,
-     userMovieLists: [],
+      userMovieLists: [],
       moviesLists: [],
       genre: {},
-      searchQuery: "", // New search query data
-      selectedGenre: "", // Currently selected genre for filtering
+      searchQuery: "",
+      selectedGenre: "",
       columns: [
         { label: "Title", key: "original_title" },
         { label: "Directors", key: "directors" },
@@ -187,99 +183,89 @@ export default {
     },
   },
   mounted() {
-  this.getUsersMovies().then(() => {
-    this.getMoviesData();
-  });
-},
+    this.user_id = authService.getUserId();
+    console.log("User id", this.user_id)
+    this.getUsersMovies().then(() => {
+      this.getMoviesData();
+    });
+  },
   methods: {
     async toggleClick(row) {
-      try{
+      try {
         row.isLoading = true;
 
-        if(row.clicked){
+        if (row.clicked) {
           await this.removeMovie(row);
-        }
-        else{
+        } else {
           await this.insertMoviesLibrary(row);
         }
-        
-        
-      row.clicked = !row.clicked;
-      row.showAlert = true;
+
+        row.clicked = !row.clicked;
+        row.showAlert = true;
+      } catch (error) {
+        console.error("Error sending movie data:", error);
+      } finally {
+        row.isLoading = false;
       }
-      catch(error){
-        console.error('Error sending movie data:', error);
-      }
-      finally {
-    // After the API request completes (success or failure), set isLoading to false
-      row.isLoading = false;
-  }
-      
     },
     handleSearch(query) {
       this.searchQuery = query;
     },
-//DELETE API
-//Remove movie from bookmark
-async removeMovie(row){
+    //DELETE API
+    //Remove movie from bookmark
+    async removeMovie(row) {
       this.loading = true;
       try {
         const response = await axios.delete(
           `http://127.0.0.1:3000/api/v1/movies/${row.id}`
         );
-        
-        console.log("Deleted successfully",response.data)
+
+        console.log("Deleted successfully", response.data);
 
         this.mounted();
-        
       } catch (error) {
-        console.error("Error deleting movie: ",error);
+        console.error("Error deleting movie: ", error);
       }
     },
 
-
     //POST METHOD
-   async insertMoviesLibrary(row){
+    async insertMoviesLibrary(row) {
       try {
         const mapToApi = {
           id: row.id,
           title: row.title,
-          casts: row.cast, 
-          directors: row.directors, 
+          casts: row.cast,
+          directors: row.directors,
           genres: row.genres,
           status: row.status,
           released_date: row.release_date,
           score: row.vote_average,
-          poster_path: row.poster_path
-      };
+          poster_path: row.poster_path,
+          user_id: this.user_id,
+        };
         const response = await axios.post(
-      `http://127.0.0.1:3000/api/v1/movies`,
-      mapToApi
-    );
-    console.log('Movie added successfully:', response.data);
-    return response;
-
-  } catch (error) {
-
-    console.error('Error adding movie:', error);
-    throw error;
-  }
+          `http://127.0.0.1:3000/api/v1/movies`,
+          mapToApi
+        );
+        console.log("Movie added successfully:", response.data);
+        return response;
+      } catch (error) {
+        console.error("Error adding movie:", error);
+        throw error;
+      }
     },
 
     //GET METHOD
-
-    async getUsersMovies(){
-      try{
+    async getUsersMovies() {
+      try {
         const response = await axios.get(
-          `http://127.0.0.1:3000/api/v1/movies`
+          `http://127.0.0.1:3000/api/v1/movies/${this.user_id}`
         );
         this.userMovieLists = response.data.results;
-        console.log("Data from db ",this.userMovieLists)
+        console.log("Data from db ", this.userMovieLists);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
       }
-      catch(error){
-        console.error("Error fetching data: ",error);
-      }
-
     },
     async getMoviesData() {
       await this.getGenre();
@@ -288,10 +274,10 @@ async removeMovie(row){
     async getMoviesList() {
       try {
         const response = await axios.get(
-           `https://api.themoviedb.org/3/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `https://api.themoviedb.org/3/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
           //  `${process.env.TMBD_API}/discover/movie?api_key=${process.env.API_KEY}`
         );
-        console.log("response test", response)
+        console.log("response test", response);
         const movies = response.data.results.map(async (movie) => {
           const directors = await this.getCredits(movie.id);
           const status = await this.getStatus(movie.id);
@@ -299,7 +285,9 @@ async removeMovie(row){
 
           // Check if the movie exists in the user's list
           //Return true if exists
-          const matched = this.userMovieLists.some((userMovie) => userMovie.id === movie.id);
+          const matched = this.userMovieLists.some(
+            (userMovie) => userMovie.id === movie.id
+          );
 
           return {
             id: movie.id,
@@ -313,7 +301,7 @@ async removeMovie(row){
             status,
             cast,
             poster_path: `https://image.tmdb.org/t/p/w500/${movie.poster_path}`,
-            clicked: matched, 
+            clicked: matched,
           };
         });
         this.moviesLists = await Promise.all(movies);
@@ -335,67 +323,59 @@ async removeMovie(row){
       }
     },
     async getCasts(movieId) {
-            try {
-                const response = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`); 
-     
-                 const cast = response.data;
-      
-                // Extract the cast information (name and character)
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`
+        );
 
-                const casts = cast.cast
-                .slice(0, 5)  // Get the first 5 actors
-                .map(actor => actor.name);
+        const cast = response.data;
 
-                // Join the first 5 actors with a comma
-                return casts.join(', ');
-                
-      
-      // Return the formatted cast as a comma-separated string or array (depending on your needs)
-            return casts;
-            } catch (error) {
-                console.error('Failed to fetch cast:', error);
-                return []; // Return an empty array if the request fails
-            }
-        },
+        const casts = cast.cast.slice(0, 5).map((actor) => actor.name);
 
-        async getCredits(movieId) {
-            try {
-                const response = await axios.get(
-                    `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`); // Replace with your credits API endpoint
-     
-                 this.credits = response.data;
+        return casts.join(", ");
 
-                // Extract directors from the crew array
-                const directors = this.credits.crew
-                .filter(crewMember => crewMember.job === 'Director')
-                .map(director => director.name);
+        return casts;
+      } catch (error) {
+        console.error("Failed to fetch cast:", error);
+        return []; // Return an empty array if the request fails
+      }
+    },
 
-                // Join directors with a comma if there are multiple
-                return directors.join(', '); 
-        } catch (error) {
-                console.error('Failed to fetch credits:', error);
-                return '';
-        }
+    async getCredits(movieId) {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`
+        ); // Replace with your credits API endpoint
+
+        this.credits = response.data;
+
+        const directors = this.credits.crew
+          .filter((crewMember) => crewMember.job === "Director")
+          .map((director) => director.name);
+
+        return directors.join(", ");
+      } catch (error) {
+        console.error("Failed to fetch credits:", error);
+        return "";
+      }
     },
 
     async getStatus(movieId) {
-    try {
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/movie/${movieId}?api_key=432fd6918c7280751ae578aaaa17cbac`); // Replace with your movie status API endpoint
-    
-       this.statusData = await response.data;
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movieId}?api_key=432fd6918c7280751ae578aaaa17cbac`
+        );
 
-       // Return the status of the movie
-      return this.statusData.status; 
+        this.statusData = await response.data;
 
-    } catch (error) {
-      console.error('Failed to fetch movie status:', error);
-      return 'Unknown'; // Return a default status if the request fails
-    }
-  },
+        return this.statusData.status;
+      } catch (error) {
+        console.error("Failed to fetch movie status:", error);
+        return "Unknown";
+      }
+    },
     setFilter(selectedGenre) {
-      this.selectedGenre = selectedGenre; // Update the selected genre
+      this.selectedGenre = selectedGenre;
     },
   },
 };
