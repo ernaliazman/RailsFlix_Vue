@@ -3,11 +3,13 @@ import Layout from "../components/side-bar/Layout.vue";
 import Homepage from "../pages/general/Homepage.vue";
 import MovieLists from "../pages/user/MovieList.vue";
 import LandingPage from "../pages/general/LandingPage.vue";
+import authService from '../auth/auth.js';
 
 const routes = [
   {
     path: "/",
     component: Layout,
+    redirect: "/welcome",
     children: [
       {
         path: "welcome", // Default route for the layout
@@ -36,16 +38,17 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = getAuthStatus(); // Your method to check if the user is logged in
-
-//   if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-//     // If the route requires authentication and the user is not authenticated, redirect to the LandingPage
-//     next({ name: 'LandingPage' });
-//   } else {
-//     // Otherwise, allow navigation
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!authService.getToken(); // Check if the user is authenticated
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next({ path: "/welcome" }); // Redirect to the landing page if not logged in
+    } else {
+      next(); // Proceed to the authenticated route
+    }
+  } else {
+    next(); // Proceed for non-authenticated routes
+  }
+});
 
 export default router;

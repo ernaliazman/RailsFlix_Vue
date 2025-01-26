@@ -80,6 +80,7 @@
 
           <!-- Show the SVG button if isLoading is false -->
           <button
+            name="bookmark"
             v-else
             @click="toggleClick(row)"
             class="p-2 text-amber-500 hover:text-blue-600 rounded focus:outline-none"
@@ -132,6 +133,7 @@ import SearchBar from "../../components/SearchBar.vue";
 import Alert from "../../components/Alert.vue";
 import Loading from "../../components/Loading.vue";
 import authService from "../../auth/auth.js";
+import Swal from "sweetalert2";
 
 export default {
   components: {
@@ -247,6 +249,16 @@ export default {
           `http://127.0.0.1:3000/api/v1/movies`,
           mapToApi
         );
+
+        if(response.data.status == "Created"){
+           Swal.fire({
+            title: "Success!",
+            text: response.data.results.title + " has been added into your library.",
+            icon: "success",
+            confirmButtonColor: "#A93428",
+            confirmButtonText: "Okay",
+          })
+        }
         console.log("Movie added successfully:", response.data);
         return response;
       } catch (error) {

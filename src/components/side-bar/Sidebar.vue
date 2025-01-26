@@ -1,6 +1,10 @@
 <script>
 import authService from "../../auth/auth.js";
+import Logout from "../../components/Logout.vue";
 export default {
+  components: {
+    Logout,
+  },
   data() {
     return {
       name: "",
@@ -117,32 +121,14 @@ export default {
 
           <span class="mx-4">Your Movies</span>
         </router-link>
-
-        
       </nav>
 
+     
       <div
-          class="menu-item flex items-center hover px-6 py-2 mt-4 duration-200 border-l-4"
-          to="/homepage"
-        >
-        <button class=" hover:bg-sky-700">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-8"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
-            />
-          </svg>
-          <!-- <span class="mx-4">Log out</span> -->
-        </button>
-        </div>
+        class="menu-item flex items-center  mt-4 duration-200 border-l-4"
+      >
+        <Logout />
+      </div>
     </div>
   </div>
 </template>

@@ -22,7 +22,7 @@
           <div class="relative flex items-center">
             <input
               v-model="name"
-              name="email"
+              name="name"
               type="text"
               required
               class="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"

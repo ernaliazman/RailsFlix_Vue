@@ -174,6 +174,8 @@ import Alert from "../../components/Alert.vue";
 import Modal from "../../components/Modal.vue";
 import authService from '../../auth/auth.js';
 import Dropdown from '../../components/Dropdown.vue';
+import Swal from "sweetalert2";
+
 
 export default {
   components: {
@@ -323,7 +325,19 @@ export default {
         this.expectedData = null;
         this.updateReview = '';
         this.updateStatus = '';
-        this.getMoviesList();
+
+        if(response.data.status == "Updated"){
+           Swal.fire({
+            title: "Success!",
+            text: response.data.results.title + " has been updated successfully.",
+            icon: "success",
+            confirmButtonColor: "#A93428",
+            confirmButtonText: "Okay",
+          }).then(() => {
+            this.getMoviesList();
+          })
+        }
+        
      }
      catch(error){
        console.error("Error updating movie: ",error);
@@ -344,7 +358,19 @@ export default {
         this.isModalOpen = false;
         this.expectedData = null;
         this.selectedTitle = '';
-        this.getMoviesList();
+       
+
+        if(response.data.status == "Deleted"){
+           Swal.fire({
+            title: "Success!",
+            text: response.data.results.title + " has been removed from your library.",
+            icon: "success",
+            confirmButtonColor: "#A93428",
+            confirmButtonText: "Okay",
+          }).then(() => {
+            this.getMoviesList();
+          })
+        }
         
       } catch (error) {
         console.error("Error deleting movie: ",error);
