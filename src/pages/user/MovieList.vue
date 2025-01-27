@@ -192,6 +192,8 @@ export default {
   
   data() {
     return {
+      base_URL:'',
+      tmdb_URL:'',
       user_id: '',
       moviesLists: [],
       genre: {},
@@ -240,6 +242,8 @@ export default {
   },
   mounted() {
      this.user_id = authService.getUserId();
+     this.base_URL = import.meta.env.VITE_LOCAL_API
+     this.tmdb_URL = import.meta.env.VITE_TMDB_API
      
     this.getMoviesList();
   },
@@ -310,6 +314,7 @@ export default {
 
 //METHODS
   methods: {
+    
     handleSearch(query) {
       this.searchQuery = query; 
     },
@@ -318,8 +323,9 @@ export default {
     //UPDATE API
     async updateMovie(){
      try{
+      
        const response = await axios.put(
-        `http://127.0.0.1:3000/api/v1/movies/${this.id}`,
+        `${this.base_URL}/api/v1/movies/${this.id}`,
         {
           review: this.updateReview,
           status: this.updateStatus,
@@ -353,8 +359,9 @@ export default {
     async removeMovie(expectedData){
       this.loading = true;
       try {
+        
         const response = await axios.delete(
-          `http://127.0.0.1:3000/api/v1/movies/${expectedData.id}`
+          `${this.base_URL}/api/v1/movies/${expectedData.id}`
         );
         
         console.log("Deleted successfully",response.data)
@@ -384,9 +391,10 @@ export default {
     //GET API
     async getMoviesList() {
       try {
+        
         authService.setAuthHeader();
         const response = await axios.get(
-          `http://127.0.0.1:3000/api/v1/movies/${this.user_id}`
+          `${this.base_URL}/api/v1/movies/${this.user_id}`
         );
         this.moviesLists = response.data.results;
         console.log("Data from db ",this.moviesLists)
@@ -398,7 +406,7 @@ export default {
     async getGenre() {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/genre/movie/list?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `${this.tmdb_URL}/genre/movie/list?api_key=432fd6918c7280751ae578aaaa17cbac`
         );
         this.genre = response.data.genres.reduce((acc, genre) => {
           acc[genre.id] = genre.name;

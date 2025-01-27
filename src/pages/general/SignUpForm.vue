@@ -153,10 +153,15 @@ import Swal from "sweetalert2";
 export default {
   data() {
     return {
+      base_URL:'',
       name: "",
       email: "",
       password: "",
     };
+  },
+
+  mounted(){
+    this.base_URL = import.meta.env.VITE_LOCAL_API
   },
   methods: {
     switchToSignIn() {
@@ -167,7 +172,7 @@ export default {
       try {
         // Send POST request with email and password
         const response = await axios.post(
-          "http://127.0.0.1:3000/api/v1/user/signup",
+          `${this.base_URL}/api/v1/user/signup`,
           {
             user: {
               name: this.name,

@@ -111,9 +111,14 @@ import authService from "../../auth/auth.js";
 export default {
   data() {
     return {
+      base_URL:'',
       email: "",
       password: "",
     };
+  },
+
+  mounted() {
+    this.base_URL = import.meta.env.VITE_LOCAL_API
   },
 
   methods: {
@@ -126,7 +131,7 @@ export default {
       try {
         // Send POST request with email and password
         const response = await axios.post(
-          "http://127.0.0.1:3000/api/v1/user/login",
+          `${this.base_URL}/api/v1/user/login`,
           {
             email: this.email,
             password: this.password,

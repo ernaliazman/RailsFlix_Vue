@@ -145,7 +145,9 @@ export default {
   },
   data() {
     return {
-      user_id: '',
+      base_URL: "",
+      tmdb_URL: "",
+      user_id: "",
       clicked: false,
       userMovieLists: [],
       moviesLists: [],
@@ -186,7 +188,8 @@ export default {
   },
   mounted() {
     this.user_id = authService.getUserId();
-    console.log("User id", this.user_id)
+    this.base_URL = import.meta.env.VITE_LOCAL_API;
+    this.tmdb_URL = import.meta.env.VITE_TMDB_API;
     this.getUsersMovies().then(() => {
       this.getMoviesData();
     });
@@ -219,7 +222,7 @@ export default {
       this.loading = true;
       try {
         const response = await axios.delete(
-          `http://127.0.0.1:3000/api/v1/movies/${row.id}`
+          `${this.base_URL}/api/v1/movies/${row.id}`
         );
 
         console.log("Deleted successfully", response.data);
@@ -246,18 +249,20 @@ export default {
           user_id: this.user_id,
         };
         const response = await axios.post(
-          `http://127.0.0.1:3000/api/v1/movies`,
+          `${this.base_URL}/api/v1/movies`,
           mapToApi
         );
 
-        if(response.data.status == "Created"){
-           Swal.fire({
+        if (response.data.status == "Created") {
+          Swal.fire({
             title: "Success!",
-            text: response.data.results.title + " has been added into your library.",
+            text:
+              response.data.results.title +
+              " has been added into your library.",
             icon: "success",
             confirmButtonColor: "#A93428",
             confirmButtonText: "Okay",
-          })
+          });
         }
         console.log("Movie added successfully:", response.data);
         return response;
@@ -271,7 +276,7 @@ export default {
     async getUsersMovies() {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:3000/api/v1/movies/${this.user_id}`
+          `${this.base_URL}/api/v1/movies/${this.user_id}`
         );
         this.userMovieLists = response.data.results;
         console.log("Data from db ", this.userMovieLists);
@@ -286,7 +291,7 @@ export default {
     async getMoviesList() {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `${this.tmdb_URL}/discover/movie?api_key=432fd6918c7280751ae578aaaa17cbac`
           //  `${process.env.TMBD_API}/discover/movie?api_key=${process.env.API_KEY}`
         );
         console.log("response test", response);
@@ -324,7 +329,7 @@ export default {
     async getGenre() {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/genre/movie/list?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `${this.tmdb_URL}/genre/movie/list?api_key=432fd6918c7280751ae578aaaa17cbac`
         );
         this.genre = response.data.genres.reduce((acc, genre) => {
           acc[genre.id] = genre.name;
@@ -337,7 +342,7 @@ export default {
     async getCasts(movieId) {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `${this.tmdb_URL}/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`
         );
 
         const cast = response.data;
@@ -356,7 +361,7 @@ export default {
     async getCredits(movieId) {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `${this.tmdb_URL}/movie/${movieId}/credits?api_key=432fd6918c7280751ae578aaaa17cbac`
         ); // Replace with your credits API endpoint
 
         this.credits = response.data;
@@ -375,7 +380,7 @@ export default {
     async getStatus(movieId) {
       try {
         const response = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}?api_key=432fd6918c7280751ae578aaaa17cbac`
+          `${this.tmdb_URL}/movie/${movieId}?api_key=432fd6918c7280751ae578aaaa17cbac`
         );
 
         this.statusData = await response.data;
