@@ -48,6 +48,7 @@
       },
       placeholder: {
         type: String,
+        
         default: 'Select an option',
       },
       modelValue: {

@@ -25,14 +25,14 @@
       @update:isOpen="isModalEditOpen = $event"
       :title="'Update Movie'"
       actionText="Update"
-      @action = "updateMovie(updateReview, updateStatus, id)"
+      @action = "updateMovie()"
     >
       <!-- Form Content as a Slot -->
       <!-- v-model="expectedData.title"
       v-model="editedData.description"
       v-model="editedData.genre" -->
     <template #customBody>
-  <form @submit.prevent="updateMovie(updateReview,updateStatus,id)" class="px-8 pt-6">
+  <form @submit.prevent="updateMovie()" class="px-8 pt-6">
     <div class="w-full max-w-xs">
 
     <div class="mb-2">
@@ -288,6 +288,7 @@ export default {
 
     expose({
       openModal,
+      openModalEdit
     });
 
     return {
@@ -312,15 +313,16 @@ export default {
     handleSearch(query) {
       this.searchQuery = query; 
     },
+    
 
     //UPDATE API
-    async updateMovie(review,status,id){
+    async updateMovie(){
      try{
        const response = await axios.put(
-        `http://127.0.0.1:3000/api/v1/movies/${id}`,
+        `http://127.0.0.1:3000/api/v1/movies/${this.id}`,
         {
-          review: review,
-          status: status,
+          review: this.updateReview,
+          status: this.updateStatus,
         })
 
         this.isModalEditOpen = false;
