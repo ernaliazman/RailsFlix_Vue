@@ -39,15 +39,15 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!authService.getToken(); // Check if the user is authenticated
+  const isAuthenticated = !!authService.getToken(); 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
-      next({ path: "/welcome" }); // Redirect to the landing page if not logged in
+      next({ path: "/welcome" });
     } else {
-      next(); // Proceed to the authenticated route
+      next(); 
     }
   } else {
-    next(); // Proceed for non-authenticated routes
+    next(); 
   }
 });
 

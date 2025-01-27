@@ -117,6 +117,7 @@
       <template #column-actions="{ row }">
         <div class="flex space-x-2">
           <button
+          name="edit"
             @click="openModalEdit(row)"
             class="p-2 text-blue-500 hover:text-blue-600 rounded focus:outline-none"
           >
@@ -137,6 +138,7 @@
             </svg>
           </button>
           <button
+          name = "delete"
             @click="openModal(row)"
             class="p-2 text-red-500 hover:text-red-600 rounded focus:outline-none"
             aria-label="Delete"

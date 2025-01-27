@@ -70,6 +70,7 @@
               Close
             </button>
             <button
+            name="action"
               class="px-6 py-3 font-medium tracking-wide text-white bg-[#A93428] rounded-md hover:bg-gray-500 focus:outline-none"
               @click="confirmAction"
             >
